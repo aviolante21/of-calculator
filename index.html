@@ -656,8 +656,8 @@
         <div class="mobile-annualized-label">Annualized</div>
         <div class="mobile-sub-row">
           <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-pct">0%</div>
-            <div class="mobile-sub-label">OnlyFans Income %</div>
+            <div class="mobile-sub-val" id="mobile-pct">∞</div>
+            <div class="mobile-sub-label">Days to $100K</div>
           </div>
           <div class="mobile-divider"></div>
           <div class="mobile-sub-item">
@@ -679,8 +679,8 @@
 
       <div class="t-stats">
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-monthly">0%</div>
-          <div class="t-stat-label">OnlyFans Income %</div>
+          <div class="t-stat-val" id="stat-monthly">∞</div>
+          <div class="t-stat-label">Days to $100K</div>
         </div>
         <div class="t-stat">
           <div class="t-stat-val" id="stat-annual">$36K</div>
@@ -832,10 +832,11 @@
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
-    const ofPct = grand > 0 ? Math.round((ofTotal / grand) * 100) : 0;
-    // OF % — override animateCounter to show % symbol
-    const prevPct = parseFloat(smEl.dataset.raw || 0);
-    smEl.dataset.raw = ofPct;
+    // Days to $100K at current daily rate
+    const dailyRate = grand / (m * 30);
+    const daysTo100k = dailyRate > 0 ? Math.ceil(100000 / dailyRate) : Infinity;
+    const prevDays = parseFloat(smEl.dataset.raw || 0);
+    smEl.dataset.raw = daysTo100k === Infinity ? 0 : daysTo100k;
     (() => {
       const start = performance.now();
       const dur = 500;
@@ -844,9 +845,11 @@
       function step(now) {
         const p = Math.min((now - start) / dur, 1);
         const ease = 1 - Math.pow(1 - p, 3);
-        smEl.textContent = Math.round(prevPct + (ofPct - prevPct) * ease) + '%';
+        if (daysTo100k === Infinity) { smEl.textContent = '∞'; return; }
+        const cur = Math.ceil(prevDays + (daysTo100k - prevDays) * ease);
+        smEl.textContent = cur > 9999 ? '∞' : cur.toLocaleString();
         if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
-        else { smEl.textContent = ofPct + '%'; delete activeAnimations[id]; }
+        else { smEl.textContent = daysTo100k > 9999 ? '∞' : daysTo100k.toLocaleString(); delete activeAnimations[id]; }
       }
       activeAnimations[id] = requestAnimationFrame(step);
     })();
@@ -860,7 +863,7 @@
     const mPct    = document.getElementById('mobile-pct');
     const mGrand  = document.getElementById('mobile-grand');
     if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
-    if (mPct)    mPct.textContent    = ofPct + '%';
+    if (mPct)    mPct.textContent    = daysTo100k === Infinity || daysTo100k > 9999 ? '∞' : daysTo100k.toLocaleString();
     if (mGrand)  mGrand.textContent  = fmt(grand);
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
