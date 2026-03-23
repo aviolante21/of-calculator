@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnlyFans Revenue Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #edf7fd;
+    --surface: #ffffff;
+    --border:  #cce8f6;
+    --blue:    #00aff0;
+    --text:    #0d2d40;
+    --muted:   #6aaac8;
+    --muted2:  #b8d9ee;
+    --green:   #00956b;
+    --shadow:  0 2px 18px rgba(0,175,240,0.10);
+  }
+
+  body.dark {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #1e2d3d;
+    --text:    #e6f1ff;
+    --muted:   #4a90b8;
+    --muted2:  #2a4a62;
+    --green:   #00e5a0;
+    --shadow:  0 2px 18px rgba(0,0,0,0.4);
+  }
+
+  .theme-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .theme-btn:hover {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--blue);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    color: #fff;
+  }
+  .topbar-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* PAGE */
+  .page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 32px;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: fit-content;
+  }
+
+  /* CARD GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 210px);
+    grid-template-rows: repeat(2, 210px);
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 18px 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: var(--blue);
+    box-shadow: 0 6px 24px rgba(0,175,240,0.18);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .card-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+  }
+  .card-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--border);
+    margin-top: 3px;
+  }
+
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+    line-height: 1.5;
+  }
+  .card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .card-revenue {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+    flex: 1;
+  }
+
+  /* Sliders */
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+    margin-top: auto;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,175,240,0.45);
+    transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: none; cursor: pointer;
+  }
+  .slider-range {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+  .slider-range span {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted2);
+  }
+
+  /* TOTALS BAR */
+  .totals-bar {
+    background: var(--blue);
+    border-radius: 16px;
+    padding: 16px 24px;
+    box-shadow: 0 4px 28px rgba(0,175,240,0.22);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 882px; /* 4×210 + 3×14 gaps = 882 */
+  }
+
+  .t-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 170px;
+    padding-right: 24px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .t-head {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 2px;
+  }
+  .t-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 46px;
+    line-height: 1;
+    color: #fff;
+  }
+  .t-sub {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 3px;
+  }
+  .t-sub-base {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.08em;
+  }
+  .t-sub-of {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+  }
+  .t-period {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 2px;
+  }
+
+  .t-stats {
+    display: flex;
+    padding: 0 20px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .t-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 18px;
+    border-right: 1px solid rgba(255,255,255,0.12);
+  }
+  .t-stat:last-child { border-right: none; }
+  .t-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: #fff;
+    line-height: 1;
+  }
+  .t-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+  }
+
+  .t-breakdown {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    padding-left: 20px;
+  }
+  .t-breakdown-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2px;
+  }
+  .brow { display: flex; align-items: center; gap: 7px; }
+  .bname {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.5);
+    width: 50px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bbar-wrap { flex: 1; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+  .bbar { height: 100%; background: rgba(255,255,255,0.88); border-radius: 2px; width: 0%; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .bval {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: rgba(255,255,255,0.85);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .scene-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .scene-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    border-color: rgba(255,255,255,0.6);
+  }
+  .scene-btn.active {
+    background: #fff;
+    border-color: #fff;
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  .pop { animation: pop 0.22s ease; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+
+    html, body { overflow: auto; height: auto; }
+
+    .topbar {
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px;
+    }
+    .topbar-title { font-size: 16px; }
+    .topbar-tag { display: none; }
+    .topbar > div { gap: 5px; }
+    .scene-btn { padding: 5px 8px; font-size: 8px; }
+
+    .page {
+      padding: 12px 12px 24px;
+      justify-content: flex-start;
+      overflow: auto;
+    }
+
+    .wrapper { width: 100%; }
+
+    .cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: none;
+      width: 100%;
+    }
+
+    .card {
+      aspect-ratio: 1 / 1;
+      padding: 14px 14px 12px;
+    }
+
+    .card-value { font-size: 34px; }
+    .card-icon { width: 34px; height: 34px; font-size: 15px; }
+
+    .totals-bar {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+      padding: 18px 16px;
+    }
+
+    .t-main {
+      min-width: unset;
+      padding-right: 0;
+      border-right: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 14px;
+    }
+
+    .t-amount { font-size: 52px; }
+
+    .t-stats {
+      padding: 0;
+      border-right: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 14px;
+      justify-content: space-around;
+    }
+
+    .t-stat { padding: 0 10px; }
+    .t-stat-val { font-size: 36px; }
+    .t-stat-label { font-size: 9px; }
+
+    .t-breakdown { padding-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">⚡ OnlyFans Revenue Calculator</div>
+  <div style="display:flex;gap:8px;">
+    <button class="scene-btn" id="btn-conservative" onclick="loadScenario('conservative')">🐢 Conservative</button>
+    <button class="scene-btn" id="btn-realistic"    onclick="loadScenario('realistic')">🎯 Realistic</button>
+    <button class="scene-btn" id="btn-aggressive"   onclick="loadScenario('aggressive')">🚀 Aggressive</button>
+    <button class="scene-btn" onclick="resetAll()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);">↺ Reset</button>
+  </div>
+  <div class="topbar-tag">After 20% OF Fee · Creator Earnings Projector</div>
+</div>
+
+<div class="page">
+  <div class="wrapper">
+
+    <div class="cards-grid">
+
+      <!-- Subscribers -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">👥</div><div class="card-dot"></div></div>
+        <div class="card-label">New Subs / Month @ $5</div>
+        <div class="card-value" id="val-subs">0</div>
+        <div class="card-revenue" id="rev-subs">$0 total</div>
+        <input type="range" min="0" max="500" step="5" value="0" oninput="update('subs',this.value)">
+        <div class="slider-range"><span>0</span><span>500</span></div>
+      </div>
+
+      <!-- Panties -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">👃</div><div class="card-dot"></div></div>
+        <div class="card-label">Panties @ $150 ea</div>
+        <div class="card-value" id="val-panties">0</div>
+        <div class="card-revenue" id="rev-panties">$0 / mo</div>
+        <input type="range" min="0" max="50" step="1" value="0" oninput="update('panties',this.value)">
+        <div class="slider-range"><span>0</span><span>50</span></div>
+      </div>
+
+      <!-- Leggings -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">🩱</div><div class="card-dot"></div></div>
+        <div class="card-label">Leggings @ $150 ea</div>
+        <div class="card-value" id="val-leggings">0</div>
+        <div class="card-revenue" id="rev-leggings">$0 / mo</div>
+        <input type="range" min="0" max="50" step="1" value="0" oninput="update('leggings',this.value)">
+        <div class="slider-range"><span>0</span><span>50</span></div>
+      </div>
+
+      <!-- Booty Shorts -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">🍑</div><div class="card-dot"></div></div>
+        <div class="card-label">Booty Shorts @ $150 ea</div>
+        <div class="card-value" id="val-shorts">0</div>
+        <div class="card-revenue" id="rev-shorts">$0 / mo</div>
+        <input type="range" min="0" max="50" step="1" value="0" oninput="update('shorts',this.value)">
+        <div class="slider-range"><span>0</span><span>50</span></div>
+      </div>
+
+      <!-- Socks -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">🧦</div><div class="card-dot"></div></div>
+        <div class="card-label">Socks @ $50 ea</div>
+        <div class="card-value" id="val-socks">0</div>
+        <div class="card-revenue" id="rev-socks">$0 / mo</div>
+        <input type="range" min="0" max="50" step="1" value="0" oninput="update('socks',this.value)">
+        <div class="slider-range"><span>0</span><span>50</span></div>
+      </div>
+
+      <!-- Photo Sets -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">📸</div><div class="card-dot"></div></div>
+        <div class="card-label">Photo Sets @ $100 ea</div>
+        <div class="card-value" id="val-photos">0</div>
+        <div class="card-revenue" id="rev-photos">$0 / mo</div>
+        <input type="range" min="0" max="50" step="1" value="0" oninput="update('photos',this.value)">
+        <div class="slider-range"><span>0</span><span>50</span></div>
+      </div>
+
+      <!-- Tips -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">💸</div><div class="card-dot"></div></div>
+        <div class="card-label">Tips / month</div>
+        <div class="card-value" id="val-tips">$0</div>
+        <div class="card-revenue" id="rev-tips">$0 / mo</div>
+        <input type="range" min="0" max="1000" step="5" value="0" oninput="update('tips',this.value)">
+        <div class="slider-range"><span>$0</span><span>$1,000</span></div>
+      </div>
+
+      <!-- PPV / Unlock -->
+      <div class="card">
+        <div class="card-top"><div class="card-icon">🔑</div><div class="card-dot"></div></div>
+        <div class="card-label">PPV / Unlock / month</div>
+        <div class="card-value" id="val-ppv">$0</div>
+        <div class="card-revenue" id="rev-ppv">$0 / mo</div>
+        <input type="range" min="0" max="1000" step="5" value="0" oninput="update('ppv',this.value)">
+        <div class="slider-range"><span>$0</span><span>$1,000</span></div>
+      </div>
+
+    </div>
+
+    <!-- TOTALS BAR -->
+    <div class="totals-bar">
+
+      <div class="t-main">
+        <div class="t-head">Base + OF Earnings</div>
+        <div class="t-amount" id="grand-total">$36,000</div>
+        <div class="t-sub">
+          <span class="t-sub-base">$36K BASE +</span>
+          <span class="t-sub-of" id="of-addon">$0 OF</span>
+        </div>
+        <div class="t-period" id="total-period">over 1 month</div>
+      </div>
+
+      <div class="t-stats">
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-monthly">$3K</div>
+          <div class="t-stat-label">Per Month</div>
+        </div>
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-daily">$99</div>
+          <div class="t-stat-label">Per Day</div>
+        </div>
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-annual">$36K</div>
+          <div class="t-stat-label">Annualized</div>
+        </div>
+      </div>
+
+      <div class="t-breakdown">
+        <div class="t-breakdown-title">Breakdown (after 20% OF fee)</div>
+        <div class="brow"><span class="bname">Subs</span><div class="bbar-wrap"><div class="bbar" id="bar-subs"></div></div><span class="bval" id="bv-subs">$0</span></div>
+        <div class="brow"><span class="bname">Panties</span><div class="bbar-wrap"><div class="bbar" id="bar-panties"></div></div><span class="bval" id="bv-panties">$0</span></div>
+        <div class="brow"><span class="bname">Leggings</span><div class="bbar-wrap"><div class="bbar" id="bar-leggings"></div></div><span class="bval" id="bv-leggings">$0</span></div>
+        <div class="brow"><span class="bname">Shorts</span><div class="bbar-wrap"><div class="bbar" id="bar-shorts"></div></div><span class="bval" id="bv-shorts">$0</span></div>
+        <div class="brow"><span class="bname">Socks</span><div class="bbar-wrap"><div class="bbar" id="bar-socks"></div></div><span class="bval" id="bv-socks">$0</span></div>
+        <div class="brow"><span class="bname">Photos</span><div class="bbar-wrap"><div class="bbar" id="bar-photos"></div></div><span class="bval" id="bv-photos">$0</span></div>
+        <div class="brow"><span class="bname">Tips</span><div class="bbar-wrap"><div class="bbar" id="bar-tips"></div></div><span class="bval" id="bv-tips">$0</span></div>
+        <div class="brow"><span class="bname">PPV</span><div class="bbar-wrap"><div class="bbar" id="bar-ppv"></div></div><span class="bval" id="bv-ppv">$0</span></div>
+      </div>
+
+    </div>
+
+    </div>
+
+    <div style="text-align:center;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;">
+      © 2026 Anthony Mark, Inc. All Rights Reserved.
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const BASE_SALARY  = 36000;
+  const state  = { subs:0, panties:0, leggings:0, shorts:0, socks:0, photos:0, tips:0, ppv:0, months:1 };
+  const prices = { subs:5, panties:150, leggings:150, shorts:150, socks:50, photos:100 };
+  const platformKeys = ['subs', 'tips', 'ppv'];
+
+  function fmt(n) {
+    if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return '$' + (n/1000).toFixed(1) + 'K';
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function update(key, val) {
+    state[key] = parseFloat(val);
+    if (key === 'tips' || key === 'ppv') {
+      document.getElementById('val-' + key).textContent = '$' + Math.round(state[key]).toLocaleString();
+      document.getElementById('rev-' + key).textContent = fmt(state[key]) + ' / mo';
+    } else if (key === 'subs') {
+      document.getElementById('val-subs').textContent = Math.round(state.subs).toLocaleString();
+      // show preview at current month setting
+      const m = Math.round(state.months);
+      const totalSubs = state.subs * m;
+      document.getElementById('rev-subs').textContent = Math.round(totalSubs).toLocaleString() + ' total by mo ' + m;
+    } else if (key !== 'months') {
+      document.getElementById('val-' + key).textContent = Math.round(state[key]).toLocaleString();
+      document.getElementById('rev-' + key).textContent = fmt(state[key] * prices[key]) + ' / mo';
+    }
+    recalculate();
+  }
+
+  function recalculate() {
+    const m = Math.round(state.months);
+
+    // Compounding subscriber revenue:
+    // Each month's new cohort of subs pays $5 for every remaining month.
+    // Month 1 cohort: subs * $5 * m months
+    // Month 2 cohort: subs * $5 * (m-1) months
+    // ...Month m cohort: subs * $5 * 1 month
+    // Total = subs * $5 * (m + m-1 + ... + 1) = subs * $5 * m*(m+1)/2
+    const subRevenue = state.subs * prices.subs * (m * (m + 1) / 2);
+    const totalSubs  = state.subs * m;
+
+    // Update sub card label to reflect current month setting
+    document.getElementById('val-subs').textContent = Math.round(state.subs).toLocaleString();
+    document.getElementById('rev-subs').textContent = state.subs > 0
+      ? Math.round(totalSubs).toLocaleString() + ' total by mo ' + m
+      : '$0 total';
+
+    const periodRev = {
+      subs:     subRevenue,
+      panties:  state.panties  * prices.panties  * m,
+      leggings: state.leggings * prices.leggings * m,
+      shorts:   state.shorts   * prices.shorts   * m,
+      socks:    state.socks    * prices.socks    * m,
+      photos:   state.photos   * prices.photos   * m,
+      tips:     state.tips     * m,
+      ppv:      state.ppv      * m,
+    };
+
+    const netPeriod = {};
+    Object.keys(periodRev).forEach(k => {
+      netPeriod[k] = platformKeys.includes(k) ? periodRev[k] * 0.8 : periodRev[k];
+    });
+
+    const ofTotal       = Object.values(netPeriod).reduce((a,b)=>a+b, 0);
+    const baseForPeriod = (BASE_SALARY / 12) * m;
+    const grand         = baseForPeriod + ofTotal;
+    const avgMonthlyOF  = ofTotal / m;
+
+    const gtEl = document.getElementById('grand-total');
+    gtEl.textContent = fmt(grand);
+    gtEl.classList.remove('pop');
+    void gtEl.offsetWidth;
+    gtEl.classList.add('pop');
+
+    document.getElementById('of-addon').textContent     = fmt(ofTotal) + ' OF';
+    document.getElementById('total-period').textContent = 'over ' + m + (m===1?' month':' months');
+    document.getElementById('stat-monthly').textContent = fmt((BASE_SALARY / 12) + avgMonthlyOF);
+    document.getElementById('stat-daily').textContent   = fmt((BASE_SALARY / 365) + (avgMonthlyOF / 30));
+    document.getElementById('stat-annual').textContent  = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+
+    const maxVal = Math.max(...Object.values(netPeriod), 1);
+    Object.keys(netPeriod).forEach(k => {
+      document.getElementById('bar-' + k).style.width = (netPeriod[k] / maxVal * 100) + '%';
+      document.getElementById('bv-'  + k).textContent = fmt(netPeriod[k]);
+    });
+  }
+
+  // ── SCENARIOS ──
+  // Built-in presets
+  const presets = {
+    conservative: { subs:25,  panties:2, leggings:1, shorts:1, socks:2, photos:2,  tips:50,  ppv:100, months:1 },
+    realistic:    { subs:75,  panties:5, leggings:2, shorts:2, socks:4, photos:5,  tips:200, ppv:300, months:1 },
+    aggressive:   { subs:150, panties:8, leggings:4, shorts:6, socks:8, photos:12, tips:500, ppv:800, months:1 },
+  };
+  let activeScenario = null;
+
+  function applyState(s) {
+    Object.keys(s).forEach(k => { state[k] = s[k]; });
+    // Update all slider positions and card displays
+    const sliderMap = { subs:'subs', panties:'panties', leggings:'leggings', shorts:'shorts', socks:'socks', photos:'photos', tips:'tips', ppv:'ppv', months:'months' };
+    document.querySelectorAll('input[type=range]').forEach(el => {
+      const key = el.getAttribute('oninput').match(/'(\w+)'/)?.[1];
+      if (key && state[key] !== undefined) el.value = state[key];
+    });
+    // Refresh card displays
+    ['panties','leggings','shorts','socks','photos'].forEach(k => {
+      document.getElementById('val-' + k).textContent = Math.round(state[k]).toLocaleString();
+      document.getElementById('rev-' + k).textContent = fmt(state[k] * prices[k]) + ' / mo';
+    });
+    ['tips','ppv'].forEach(k => {
+      document.getElementById('val-' + k).textContent = '$' + Math.round(state[k]).toLocaleString();
+      document.getElementById('rev-' + k).textContent = fmt(state[k]) + ' / mo';
+    });
+    document.getElementById('val-subs').textContent = Math.round(state.subs).toLocaleString();
+    recalculate();
+  }
+
+  function resetAll() {
+    Object.keys(state).forEach(k => { state[k] = k === 'months' ? 1 : 0; });
+    document.querySelectorAll('input[type=range]').forEach(s => { s.value = 0; });
+    ['subs','panties','leggings','shorts','socks','photos'].forEach(k => {
+      document.getElementById('val-' + k).textContent = '0';
+      document.getElementById('rev-' + k).textContent = '$0 / mo';
+    });
+    ['tips','ppv'].forEach(k => {
+      document.getElementById('val-' + k).textContent = '$0';
+      document.getElementById('rev-' + k).textContent = '$0 / mo';
+    });
+    document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+    activeScenario = null;
+    recalculate();
+  }
+
+  function loadScenario(name) {
+    applyState(presets[name]);
+    activeScenario = name;
+    document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + name).classList.add('active');
+  }
+
+  document.querySelectorAll('input[type=range]').forEach(s => { s.value = 0; });
+  recalculate();
+</script>
+</body>
+</html>
