@@ -110,66 +110,68 @@
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px 18px 14px;
+    border-radius: 14px;
+    padding: 16px 18px 14px;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     transition: border-color 0.2s, box-shadow 0.2s;
     overflow: hidden;
+    position: relative;
   }
   .card:hover {
     border-color: var(--blue);
-    box-shadow: 0 6px 24px rgba(0,175,240,0.18);
+    box-shadow: 0 6px 24px rgba(0,175,240,0.15);
   }
+  .card:hover .card-icon-watermark { opacity: 1; }
 
+  /* Top row: label left, price tag right */
   .card-top {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .card-icon {
-    width: 42px;
-    height: 42px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 19px;
+    justify-content: space-between;
+    margin-bottom: 6px;
   }
-  .card-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--border);
-    margin-top: 3px;
+
+  /* Watermark emoji — bottom right corner */
+  .card-icon-watermark {
+    position: absolute;
+    bottom: 44px;
+    right: 14px;
+    font-size: 38px;
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    line-height: 1;
   }
+
+  .card-dot { display: none; }
 
   .card-label {
     font-family: 'DM Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 5px;
-    line-height: 1.5;
+    line-height: 1.4;
   }
+
   .card-value {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 44px;
-    line-height: 1;
+    font-size: 58px;
+    line-height: 0.95;
     color: var(--text);
+    margin-top: auto;
     margin-bottom: 2px;
+    letter-spacing: -0.01em;
   }
+
   .card-revenue {
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--green);
     font-weight: 500;
-    flex: 1;
+    margin-bottom: 10px;
   }
 
   /* Sliders */
@@ -435,11 +437,11 @@
 
     .card {
       aspect-ratio: 1 / 1;
-      padding: 14px 14px 12px;
+      padding: 12px 14px 12px;
     }
 
-    .card-value { font-size: 34px; }
-    .card-icon { width: 34px; height: 34px; font-size: 15px; }
+    .card-value { font-size: 44px; }
+    .card-icon-watermark { font-size: 28px; bottom: 38px; }
 
     .totals-bar {
       width: 100%;
@@ -566,8 +568,8 @@
 
       <!-- Subscribers -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">👥</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-subs" value="5" min="0" step="1" onchange="updatePrice('subs',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">New Subs / Month</div>
+        <div class="card-top"><div class="card-label">New Subs / Month</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-subs" value="5" min="0" step="1" onchange="updatePrice('subs',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">👥</div>
         <div class="card-value" id="val-subs">0</div>
         <div class="card-revenue" id="rev-subs">$0 total</div>
         <input type="range" min="0" max="500" step="5" value="0" oninput="update('subs',this.value)">
@@ -576,8 +578,8 @@
 
       <!-- Panties -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">👃</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-panties" value="150" min="0" step="5" onchange="updatePrice('panties',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">Panties</div>
+        <div class="card-top"><div class="card-label">Panties</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-panties" value="150" min="0" step="5" onchange="updatePrice('panties',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">👃</div>
         <div class="card-value" id="val-panties">0</div>
         <div class="card-revenue" id="rev-panties">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('panties',this.value)">
@@ -586,8 +588,8 @@
 
       <!-- Leggings -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🩱</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-leggings" value="150" min="0" step="5" onchange="updatePrice('leggings',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">Leggings</div>
+        <div class="card-top"><div class="card-label">Leggings</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-leggings" value="150" min="0" step="5" onchange="updatePrice('leggings',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">🩱</div>
         <div class="card-value" id="val-leggings">0</div>
         <div class="card-revenue" id="rev-leggings">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('leggings',this.value)">
@@ -596,8 +598,8 @@
 
       <!-- Booty Shorts -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🍑</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-shorts" value="150" min="0" step="5" onchange="updatePrice('shorts',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">Booty Shorts</div>
+        <div class="card-top"><div class="card-label">Booty Shorts</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-shorts" value="150" min="0" step="5" onchange="updatePrice('shorts',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">🍑</div>
         <div class="card-value" id="val-shorts">0</div>
         <div class="card-revenue" id="rev-shorts">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('shorts',this.value)">
@@ -606,8 +608,8 @@
 
       <!-- Socks -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🧦</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-socks" value="50" min="0" step="5" onchange="updatePrice('socks',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">Socks</div>
+        <div class="card-top"><div class="card-label">Socks</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-socks" value="50" min="0" step="5" onchange="updatePrice('socks',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">🧦</div>
         <div class="card-value" id="val-socks">0</div>
         <div class="card-revenue" id="rev-socks">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('socks',this.value)">
@@ -616,8 +618,8 @@
 
       <!-- Photo Sets -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">📸</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-photos" value="100" min="0" step="5" onchange="updatePrice('photos',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
-        <div class="card-label">Photo Sets</div>
+        <div class="card-top"><div class="card-label">Photo Sets</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-photos" value="100" min="0" step="5" onchange="updatePrice('photos',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
+        <div class="card-icon-watermark">📸</div>
         <div class="card-value" id="val-photos">0</div>
         <div class="card-revenue" id="rev-photos">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('photos',this.value)">
@@ -626,8 +628,8 @@
 
       <!-- Tips -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">💸</div><div class="card-dot"></div></div>
-        <div class="card-label">Tips / month</div>
+        <div class="card-top"><div class="card-label">Tips / month</div></div>
+        <div class="card-icon-watermark">💸</div>
         <div class="card-value" id="val-tips">$0</div>
         <div class="card-revenue" id="rev-tips">$0 / mo</div>
         <input type="range" min="0" max="1000" step="5" value="0" oninput="update('tips',this.value)">
@@ -636,8 +638,8 @@
 
       <!-- PPV / Unlock -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🔑</div><div class="card-dot"></div></div>
-        <div class="card-label">PPV / Unlock / month</div>
+        <div class="card-top"><div class="card-label">PPV / Unlock / month</div></div>
+        <div class="card-icon-watermark">🔑</div>
         <div class="card-value" id="val-ppv">$0</div>
         <div class="card-revenue" id="rev-ppv">$0 / mo</div>
         <input type="range" min="0" max="1000" step="5" value="0" oninput="update('ppv',this.value)">
