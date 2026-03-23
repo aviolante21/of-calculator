@@ -443,33 +443,44 @@
       width: 100%;
       flex-direction: column;
       align-items: stretch;
-      gap: 14px;
+      gap: 0;
       padding: 18px 16px;
     }
+
+    /* On mobile: reorder sections via order property */
+    .t-main   { order: 2; }
+    .t-stats  { order: 1; }
+    .t-breakdown { order: 3; }
 
     .t-main {
       min-width: unset;
       padding-right: 0;
       border-right: none;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      padding-bottom: 14px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      border-bottom: none;
+      padding-top: 14px;
+      padding-bottom: 0;
+      margin-top: 14px;
     }
 
     .t-amount { font-size: 52px; }
 
     .t-stats {
-      padding: 0;
+      padding: 0 0 14px 0;
       border-right: none;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
       justify-content: space-around;
     }
+
+    /* Annualized gets promoted as the hero stat on mobile */
+    #stat-annual { font-size: 52px; }
+    #stat-monthly { font-size: 28px; }
 
     .t-stat { padding: 0 10px; }
     .t-stat-val { font-size: 36px; }
     .t-stat-label { font-size: 9px; }
 
-    .t-breakdown { padding-left: 0; }
+    .t-breakdown { padding-left: 0; margin-left: 0; margin-top: 14px; }
   }
 
 
