@@ -549,7 +549,7 @@
       <input
         id="baseline-input"
         type="number"
-        value="36000"
+        value="0"
         min="0"
         step="1000"
         oninput="updateBaseline(this.value)"
@@ -668,7 +668,7 @@
 
       <div class="t-main">
         <div class="t-head">Base + OF Earnings</div>
-        <div class="t-amount" id="grand-total">$36,000</div>
+        <div class="t-amount" id="grand-total">$0</div>
         <div class="t-sub">
           <span class="t-sub-base">$36K BASE +</span>
           <span class="t-sub-of" id="of-addon">$0 OF</span>
@@ -711,7 +711,7 @@
 </div>
 
 <script>
-  let BASE_SALARY = 36000;
+  let BASE_SALARY = 0;
   const state  = { subs:0, panties:0, leggings:0, shorts:0, socks:0, photos:0, tips:0, ppv:0, months:1 };
   const prices = { subs:5, panties:150, leggings:150, shorts:150, socks:50, photos:100 };
   const platformKeys = ['subs', 'tips', 'ppv'];
