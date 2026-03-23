@@ -236,7 +236,7 @@
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(255,255,255,0.55);
-    margin-bottom: 2px;
+    margin-bottom: 10px;
   }
   .t-amount {
     font-family: 'Bebas Neue', sans-serif;
@@ -359,6 +359,41 @@
     font-weight: 600;
   }
 
+  /* Editable price tag */
+  .price-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--blue);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .price-tag:hover {
+    border-color: var(--blue);
+    background: #e8f6fd;
+  }
+  .price-tag input {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--blue);
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 36px;
+    padding: 0;
+  }
+  .price-tag .pencil {
+    font-size: 7px;
+    opacity: 0.45;
+    margin-left: 2px;
+  }
+
   @keyframes pop {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.03); }
@@ -477,8 +512,8 @@
 
       <!-- Subscribers -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">👥</div><div class="card-dot"></div></div>
-        <div class="card-label">New Subs / Month @ $5</div>
+        <div class="card-top"><div class="card-icon">👥</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-subs" value="5" min="0" step="1" onchange="updatePrice('subs',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">New Subs / Month</div>
         <div class="card-value" id="val-subs">0</div>
         <div class="card-revenue" id="rev-subs">$0 total</div>
         <input type="range" min="0" max="500" step="5" value="0" oninput="update('subs',this.value)">
@@ -487,8 +522,8 @@
 
       <!-- Panties -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">👃</div><div class="card-dot"></div></div>
-        <div class="card-label">Panties @ $150 ea</div>
+        <div class="card-top"><div class="card-icon">👃</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-panties" value="150" min="0" step="5" onchange="updatePrice('panties',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">Panties</div>
         <div class="card-value" id="val-panties">0</div>
         <div class="card-revenue" id="rev-panties">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('panties',this.value)">
@@ -497,8 +532,8 @@
 
       <!-- Leggings -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🩱</div><div class="card-dot"></div></div>
-        <div class="card-label">Leggings @ $150 ea</div>
+        <div class="card-top"><div class="card-icon">🩱</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-leggings" value="150" min="0" step="5" onchange="updatePrice('leggings',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">Leggings</div>
         <div class="card-value" id="val-leggings">0</div>
         <div class="card-revenue" id="rev-leggings">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('leggings',this.value)">
@@ -507,8 +542,8 @@
 
       <!-- Booty Shorts -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🍑</div><div class="card-dot"></div></div>
-        <div class="card-label">Booty Shorts @ $150 ea</div>
+        <div class="card-top"><div class="card-icon">🍑</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-shorts" value="150" min="0" step="5" onchange="updatePrice('shorts',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">Booty Shorts</div>
         <div class="card-value" id="val-shorts">0</div>
         <div class="card-revenue" id="rev-shorts">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('shorts',this.value)">
@@ -517,8 +552,8 @@
 
       <!-- Socks -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">🧦</div><div class="card-dot"></div></div>
-        <div class="card-label">Socks @ $50 ea</div>
+        <div class="card-top"><div class="card-icon">🧦</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-socks" value="50" min="0" step="5" onchange="updatePrice('socks',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">Socks</div>
         <div class="card-value" id="val-socks">0</div>
         <div class="card-revenue" id="rev-socks">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('socks',this.value)">
@@ -527,8 +562,8 @@
 
       <!-- Photo Sets -->
       <div class="card">
-        <div class="card-top"><div class="card-icon">📸</div><div class="card-dot"></div></div>
-        <div class="card-label">Photo Sets @ $100 ea</div>
+        <div class="card-top"><div class="card-icon">📸</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-photos" value="100" min="0" step="5" onchange="updatePrice('photos',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div><div class="card-dot"></div></div>
+        <div class="card-label">Photo Sets</div>
         <div class="card-value" id="val-photos">0</div>
         <div class="card-revenue" id="rev-photos">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('photos',this.value)">
@@ -576,10 +611,6 @@
           <div class="t-stat-label">Per Month</div>
         </div>
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-daily">$99</div>
-          <div class="t-stat-label">Per Day</div>
-        </div>
-        <div class="t-stat">
           <div class="t-stat-val" id="stat-annual">$36K</div>
           <div class="t-stat-label">Annualized</div>
         </div>
@@ -618,6 +649,15 @@
     if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
     if (n >= 1000)    return '$' + (n/1000).toFixed(1) + 'K';
     return '$' + Math.round(n).toLocaleString();
+  }
+
+  function updatePrice(key, val) {
+    prices[key] = parseFloat(val) || 0;
+    // Refresh card revenue display
+    if (key !== 'tips' && key !== 'ppv') {
+      document.getElementById('rev-' + key).textContent = fmt(state[key] * prices[key]) + ' / mo';
+    }
+    recalculate();
   }
 
   function updateBaseline(val) {
@@ -719,13 +759,10 @@
 
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
-    const sdEl = document.getElementById('stat-daily');
     const saEl = document.getElementById('stat-annual');
     animateCounter(smEl, parseFloat(smEl.dataset.raw || 0), (BASE_SALARY / 12) + avgMonthlyOF, 500);
-    animateCounter(sdEl, parseFloat(sdEl.dataset.raw || 0), (BASE_SALARY / 365) + (avgMonthlyOF / 30), 500);
     animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
     smEl.dataset.raw = (BASE_SALARY / 12) + avgMonthlyOF;
-    sdEl.dataset.raw = (BASE_SALARY / 365) + (avgMonthlyOF / 30);
     saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
     document.querySelector('.t-sub-base').textContent   = fmt(BASE_SALARY) + ' BASE +';
