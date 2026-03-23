@@ -607,8 +607,8 @@
 
       <div class="t-stats">
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-monthly">$3K</div>
-          <div class="t-stat-label">Per Month</div>
+          <div class="t-stat-val" id="stat-monthly">0%</div>
+          <div class="t-stat-label">OnlyFans Income %</div>
         </div>
         <div class="t-stat">
           <div class="t-stat-val" id="stat-annual">$36K</div>
@@ -760,9 +760,25 @@
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
-    animateCounter(smEl, parseFloat(smEl.dataset.raw || 0), (BASE_SALARY / 12) + avgMonthlyOF, 500);
+    const ofPct = grand > 0 ? Math.round((ofTotal / grand) * 100) : 0;
+    // OF % — override animateCounter to show % symbol
+    const prevPct = parseFloat(smEl.dataset.raw || 0);
+    smEl.dataset.raw = ofPct;
+    (() => {
+      const start = performance.now();
+      const dur = 500;
+      const id = 'stat-monthly';
+      if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
+      function step(now) {
+        const p = Math.min((now - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        smEl.textContent = Math.round(prevPct + (ofPct - prevPct) * ease) + '%';
+        if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
+        else { smEl.textContent = ofPct + '%'; delete activeAnimations[id]; }
+      }
+      activeAnimations[id] = requestAnimationFrame(step);
+    })();
     animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
-    smEl.dataset.raw = (BASE_SALARY / 12) + avgMonthlyOF;
     saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
     document.querySelector('.t-sub-base').textContent   = fmt(BASE_SALARY) + ' BASE +';
