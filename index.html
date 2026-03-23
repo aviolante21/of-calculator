@@ -434,10 +434,48 @@
 
     .t-breakdown { padding-left: 0; }
   }
+
+  /* Milestone banner */
+  .milestone-banner {
+    position: fixed;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #00aff0, #0090cc);
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    padding: 14px 36px;
+    border-radius: 50px;
+    box-shadow: 0 8px 32px rgba(0,175,240,0.45);
+    z-index: 9999;
+    transition: top 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .milestone-banner.show { top: 20px; }
+
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    opacity: 1;
+    z-index: 9998;
+    pointer-events: none;
+    animation: confetti-fall 1.8s ease-in forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
 </style>
 </head>
 <body>
 
+<div class="milestone-banner" id="milestone-banner">🎉 $55K MILESTONE UNLOCKED!</div>
 <div class="topbar">
   <div class="topbar-title">⚡ OnlyFans Revenue Calculator</div>
   <div style="display:flex;gap:8px;">
@@ -636,6 +674,52 @@
     recalculate();
   }
 
+  // Milestone celebration
+  function triggerMilestone() {
+    // Banner
+    const banner = document.getElementById('milestone-banner');
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 3000);
+
+    // Confetti burst
+    const colors = ['#00aff0','#ffffff','#f5c842','#00e5a0','#ff8c42'];
+    for (let i = 0; i < 60; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left        = Math.random() * 100 + 'vw';
+      piece.style.top         = '-10px';
+      piece.style.background  = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay    = (Math.random() * 1.2) + 's';
+      piece.style.animationDuration = (5 + Math.random() * 3) + 's';
+      piece.style.width  = (6 + Math.random() * 6) + 'px';
+      piece.style.height = (6 + Math.random() * 6) + 'px';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 9000);
+    }
+  }
+
+  // Odometer-style counter animation
+  const activeAnimations = {};
+  function animateCounter(el, from, to, duration) {
+    const id = el.id || el.className;
+    if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
+    const start = performance.now();
+    function step(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      // Ease out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = from + (to - from) * ease;
+      el.textContent = fmt(current);
+      if (progress < 1) {
+        activeAnimations[id] = requestAnimationFrame(step);
+      } else {
+        el.textContent = fmt(to);
+        delete activeAnimations[id];
+      }
+    }
+    activeAnimations[id] = requestAnimationFrame(step);
+  }
+
   function recalculate() {
     const m = Math.round(state.months);
 
@@ -675,17 +759,29 @@
     const grand         = baseForPeriod + ofTotal;
     const avgMonthlyOF  = ofTotal / m;
 
+    // Animate grand total with odometer roll + color coding
     const gtEl = document.getElementById('grand-total');
-    gtEl.textContent = fmt(grand);
-    gtEl.classList.remove('pop');
-    void gtEl.offsetWidth;
-    gtEl.classList.add('pop');
+    const prevVal = parseFloat(gtEl.dataset.raw || BASE_SALARY);
+    gtEl.dataset.raw = grand;
+    animateCounter(gtEl, prevVal, grand, 600);
+
+    // Color-code based on OF earnings tier
+    gtEl.style.color = '#ffffff';
 
     document.getElementById('of-addon').textContent     = fmt(ofTotal) + ' OF';
     document.getElementById('total-period').textContent = 'over ' + m + (m===1?' month':' months');
-    document.getElementById('stat-monthly').textContent = fmt((BASE_SALARY / 12) + avgMonthlyOF);
-    document.getElementById('stat-daily').textContent   = fmt((BASE_SALARY / 365) + (avgMonthlyOF / 30));
-    document.getElementById('stat-annual').textContent  = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+
+    // Animate stat counters
+    const smEl = document.getElementById('stat-monthly');
+    const sdEl = document.getElementById('stat-daily');
+    const saEl = document.getElementById('stat-annual');
+    animateCounter(smEl, parseFloat(smEl.dataset.raw || 0), (BASE_SALARY / 12) + avgMonthlyOF, 500);
+    animateCounter(sdEl, parseFloat(sdEl.dataset.raw || 0), (BASE_SALARY / 365) + (avgMonthlyOF / 30), 500);
+    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
+    smEl.dataset.raw = (BASE_SALARY / 12) + avgMonthlyOF;
+    sdEl.dataset.raw = (BASE_SALARY / 365) + (avgMonthlyOF / 30);
+    saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
+
     document.querySelector('.t-sub-base').textContent   = fmt(BASE_SALARY) + ' BASE +';
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
@@ -693,6 +789,13 @@
       document.getElementById('bar-' + k).style.width = (netPeriod[k] / maxVal * 100) + '%';
       document.getElementById('bv-'  + k).textContent = fmt(netPeriod[k]);
     });
+
+    // $55K milestone — full annualized (base + OF)
+    const annualized = BASE_SALARY + (avgMonthlyOF * 12);
+    const wasAbove   = recalculate._wasAbove55k || false;
+    const isAbove    = annualized >= 55000;
+    if (isAbove && !wasAbove) triggerMilestone();
+    recalculate._wasAbove55k = isAbove;
   }
 
   // ── SCENARIOS ──
