@@ -210,6 +210,8 @@
     color: var(--muted2);
   }
 
+  .mobile-totals-hero { display: none; }
+
   /* TOTALS BAR */
   .totals-bar {
     background: #0a1628;
@@ -444,43 +446,80 @@
       flex-direction: column;
       align-items: stretch;
       gap: 0;
-      padding: 18px 16px;
+      padding: 20px 16px;
     }
 
-    /* On mobile: reorder sections via order property */
-    .t-main   { order: 2; }
-    .t-stats  { order: 1; }
-    .t-breakdown { order: 3; }
+    /* Hide desktop sections, show mobile custom layout */
+    .t-main   { display: none; }
+    .t-stats  { display: none; }
+    .mobile-totals-hero { display: flex; }
+    .t-breakdown { order: 2; margin-left: 0; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); }
 
-    .t-main {
-      min-width: unset;
-      padding-right: 0;
-      border-right: none;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      border-bottom: none;
-      padding-top: 14px;
-      padding-bottom: 0;
-      margin-top: 14px;
+    /* Mobile hero block injected via JS */
+    .mobile-totals-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      order: 1;
+      padding-bottom: 4px;
     }
 
-    .t-amount { font-size: 52px; }
-
-    .t-stats {
-      padding: 0 0 14px 0;
-      border-right: none;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      justify-content: space-around;
+    .mobile-annualized {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      line-height: 1;
+      color: #fff;
+      text-align: center;
     }
 
-    /* Annualized gets promoted as the hero stat on mobile */
-    #stat-annual { font-size: 52px; }
-    #stat-monthly { font-size: 28px; }
+    .mobile-annualized-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      margin-top: -6px;
+    }
 
-    .t-stat { padding: 0 10px; }
-    .t-stat-val { font-size: 36px; }
+    .mobile-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .mobile-sub-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .mobile-sub-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .mobile-sub-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .mobile-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+    }
+
     .t-stat-label { font-size: 9px; }
-
-    .t-breakdown { padding-left: 0; margin-left: 0; margin-top: 14px; }
   }
 
 
@@ -605,6 +644,23 @@
 
     <!-- TOTALS BAR -->
     <div class="totals-bar">
+
+      <!-- Mobile-only hero block -->
+      <div class="mobile-totals-hero" id="mobile-hero">
+        <div class="mobile-annualized" id="mobile-annual">$36.0K</div>
+        <div class="mobile-annualized-label">Annualized</div>
+        <div class="mobile-sub-row">
+          <div class="mobile-sub-item">
+            <div class="mobile-sub-val" id="mobile-pct">0%</div>
+            <div class="mobile-sub-label">OnlyFans Income %</div>
+          </div>
+          <div class="mobile-divider"></div>
+          <div class="mobile-sub-item">
+            <div class="mobile-sub-val" id="mobile-grand">$3.0K</div>
+            <div class="mobile-sub-label">Base + OF Earnings</div>
+          </div>
+        </div>
+      </div>
 
       <div class="t-main">
         <div class="t-head">Base + OF Earnings</div>
@@ -792,7 +848,15 @@
     animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
     saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
-    document.querySelector('.t-sub-base').textContent   = fmt(BASE_SALARY) + ' BASE +';
+    document.querySelector('.t-sub-base').textContent = fmt(BASE_SALARY) + ' BASE +';
+
+    // Update mobile hero
+    const mAnnual = document.getElementById('mobile-annual');
+    const mPct    = document.getElementById('mobile-pct');
+    const mGrand  = document.getElementById('mobile-grand');
+    if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+    if (mPct)    mPct.textContent    = ofPct + '%';
+    if (mGrand)  mGrand.textContent  = fmt(grand);
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
