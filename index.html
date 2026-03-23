@@ -435,47 +435,11 @@
     .t-breakdown { padding-left: 0; }
   }
 
-  /* Milestone banner */
-  .milestone-banner {
-    position: fixed;
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #00aff0, #0090cc);
-    color: #fff;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 0.12em;
-    padding: 14px 36px;
-    border-radius: 50px;
-    box-shadow: 0 8px 32px rgba(0,175,240,0.45);
-    z-index: 9999;
-    transition: top 0.5s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  .milestone-banner.show { top: 20px; }
 
-  .confetti-piece {
-    position: fixed;
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    opacity: 1;
-    z-index: 9998;
-    pointer-events: none;
-    animation: confetti-fall 1.8s ease-in forwards;
-  }
-  @keyframes confetti-fall {
-    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-    80%  { opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-  }
 </style>
 </head>
 <body>
 
-<div class="milestone-banner" id="milestone-banner">🎉 $55K MILESTONE UNLOCKED!</div>
 <div class="topbar">
   <div class="topbar-title">⚡ OnlyFans Revenue Calculator</div>
   <div style="display:flex;gap:8px;">
@@ -674,29 +638,6 @@
     recalculate();
   }
 
-  // Milestone celebration
-  function triggerMilestone() {
-    // Banner
-    const banner = document.getElementById('milestone-banner');
-    banner.classList.add('show');
-    setTimeout(() => banner.classList.remove('show'), 3000);
-
-    // Confetti burst
-    const colors = ['#00aff0','#ffffff','#f5c842','#00e5a0','#ff8c42'];
-    for (let i = 0; i < 60; i++) {
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.left        = Math.random() * 100 + 'vw';
-      piece.style.top         = '-10px';
-      piece.style.background  = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.animationDelay    = (Math.random() * 1.2) + 's';
-      piece.style.animationDuration = (5 + Math.random() * 3) + 's';
-      piece.style.width  = (6 + Math.random() * 6) + 'px';
-      piece.style.height = (6 + Math.random() * 6) + 'px';
-      document.body.appendChild(piece);
-      setTimeout(() => piece.remove(), 9000);
-    }
-  }
 
   // Odometer-style counter animation
   const activeAnimations = {};
@@ -790,13 +731,10 @@
       document.getElementById('bv-'  + k).textContent = fmt(netPeriod[k]);
     });
 
-    // $55K milestone — full annualized (base + OF)
-    const annualized = BASE_SALARY + (avgMonthlyOF * 12);
-    const wasAbove   = recalculate._wasAbove55k || false;
-    const isAbove    = annualized >= 55000;
-    if (isAbove && !wasAbove) triggerMilestone();
-    recalculate._wasAbove55k = isAbove;
+
   }
+
+  
 
   // ── SCENARIOS ──
   // Built-in presets
