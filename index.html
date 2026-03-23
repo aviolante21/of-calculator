@@ -212,10 +212,10 @@
 
   /* TOTALS BAR */
   .totals-bar {
-    background: var(--blue);
+    background: #0a1628;
     border-radius: 16px;
     padding: 16px 24px;
-    box-shadow: 0 4px 28px rgba(0,175,240,0.22);
+    box-shadow: 0 4px 28px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     gap: 0;
@@ -302,32 +302,34 @@
     flex: 1;
     flex-direction: column;
     gap: 5px;
-    padding-left: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-left: 20px;
   }
   .t-breakdown-title {
     font-family: 'DM Mono', monospace;
     font-size: 7.5px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 2px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
   }
   .brow { display: flex; align-items: center; gap: 7px; }
   .bname {
     font-family: 'DM Mono', monospace;
-    font-size: 7px;
-    color: rgba(255,255,255,0.5);
+    font-size: 8px;
+    color: rgba(255,255,255,0.85);
     width: 50px;
     flex-shrink: 0;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
   .bbar-wrap { flex: 1; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
-  .bbar { height: 100%; background: rgba(255,255,255,0.88); border-radius: 2px; width: 0%; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .bbar { height: 100%; background: #fff; border-radius: 2px; width: 0%; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
   .bval {
     font-family: 'DM Mono', monospace;
-    font-size: 8px;
-    color: rgba(255,255,255,0.85);
+    font-size: 9px;
+    color: #ffffff;
     min-width: 40px;
     text-align: right;
   }
