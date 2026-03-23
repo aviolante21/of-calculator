@@ -360,7 +360,6 @@
     background: #fff;
     border-color: #fff;
     color: var(--blue);
-    font-weight: 600;
   }
 
   /* Editable price tag */
@@ -589,7 +588,7 @@
       <!-- Leggings -->
       <div class="card">
         <div class="card-top"><div class="card-label">Leggings</div><div class="price-tag" onclick="this.querySelector('input').focus()">$<input type="number" id="price-leggings" value="150" min="0" step="5" onchange="updatePrice('leggings',this.value)" onclick="event.stopPropagation()"><span class="pencil">✎</span></div></div>
-        <div class="card-icon-watermark">🩱</div>
+        <div class="card-icon-watermark">👖</div>
         <div class="card-value" id="val-leggings">0</div>
         <div class="card-revenue" id="rev-leggings">$0 / mo</div>
         <input type="range" min="0" max="50" step="1" value="0" oninput="update('leggings',this.value)">
