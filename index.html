@@ -445,7 +445,21 @@
     <button class="scene-btn" id="btn-aggressive"   onclick="loadScenario('aggressive')">🚀 Aggressive</button>
     <button class="scene-btn" onclick="resetAll()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);">↺ Reset</button>
   </div>
-  <div class="topbar-tag">After 20% OF Fee · Creator Earnings Projector</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.6);">Base Salary</span>
+    <div style="position:relative;display:flex;align-items:center;">
+      <span style="position:absolute;left:10px;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.7);">$</span>
+      <input
+        id="baseline-input"
+        type="number"
+        value="36000"
+        min="0"
+        step="1000"
+        oninput="updateBaseline(this.value)"
+        style="font-family:'DM Mono',monospace;font-size:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:#fff;padding:5px 10px 5px 22px;width:110px;outline:none;"
+      />
+    </div>
+  </div>
 </div>
 
 <div class="page">
@@ -587,7 +601,7 @@
 </div>
 
 <script>
-  const BASE_SALARY  = 36000;
+  let BASE_SALARY = 36000;
   const state  = { subs:0, panties:0, leggings:0, shorts:0, socks:0, photos:0, tips:0, ppv:0, months:1 };
   const prices = { subs:5, panties:150, leggings:150, shorts:150, socks:50, photos:100 };
   const platformKeys = ['subs', 'tips', 'ppv'];
@@ -596,6 +610,11 @@
     if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
     if (n >= 1000)    return '$' + (n/1000).toFixed(1) + 'K';
     return '$' + Math.round(n).toLocaleString();
+  }
+
+  function updateBaseline(val) {
+    BASE_SALARY = parseFloat(val) || 0;
+    recalculate();
   }
 
   function update(key, val) {
@@ -666,6 +685,7 @@
     document.getElementById('stat-monthly').textContent = fmt((BASE_SALARY / 12) + avgMonthlyOF);
     document.getElementById('stat-daily').textContent   = fmt((BASE_SALARY / 365) + (avgMonthlyOF / 30));
     document.getElementById('stat-annual').textContent  = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+    document.querySelector('.t-sub-base').textContent   = fmt(BASE_SALARY) + ' BASE +';
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
