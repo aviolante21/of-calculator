@@ -218,7 +218,7 @@
   .totals-bar {
     background: #0a1628;
     border-radius: 16px;
-    padding: 16px 24px;
+    padding: 36px 24px;
     box-shadow: 0 4px 28px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
@@ -274,16 +274,20 @@
 
   .t-stats {
     display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
     padding: 0 20px;
-    border-right: 1px solid rgba(255,255,255,0.2);
-    flex-shrink: 0;
   }
   .t-stat {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    flex: 1;
     padding: 0 18px;
     border-right: 1px solid rgba(255,255,255,0.12);
+    text-align: center;
   }
   .t-stat:last-child { border-right: none; }
   .t-stat-val {
@@ -674,6 +678,14 @@
       <span class="t-sub-base" style="display:none"></span>
 
       <div class="t-stats">
+
+        <!-- OF Total — blue -->
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-of-total" style="color:#00aff0;">$0</div>
+          <div class="t-stat-label">OnlyFans Total</div>
+        </div>
+
+        <!-- Monthly + Annual Increase -->
         <div class="t-stat">
           <div class="t-stat-val" id="stat-monthly">-$3.0K</div>
           <div class="t-stat-label">Monthly Increase</div>
@@ -682,22 +694,13 @@
           <div class="t-stat-val" id="stat-annual-increase">-$36.0K</div>
           <div class="t-stat-label">Annual Increase</div>
         </div>
-        <div class="t-stat">
-          <div class="t-stat-val" id="stat-annual">$36K</div>
+
+        <!-- Net Salary — large, last -->
+        <div class="t-stat" style="border-right:none;">
+          <div class="t-stat-val" id="stat-annual" style="font-size:72px;line-height:1;">$0</div>
           <div class="t-stat-label">Net Salary</div>
         </div>
-      </div>
 
-      <div class="t-breakdown">
-        <div class="t-breakdown-title">Breakdown (after 20% OF fee)</div>
-        <div class="brow"><span class="bname">Subs</span><div class="bbar-wrap"><div class="bbar" id="bar-subs"></div></div><span class="bval" id="bv-subs">$0</span></div>
-        <div class="brow"><span class="bname">Panties</span><div class="bbar-wrap"><div class="bbar" id="bar-panties"></div></div><span class="bval" id="bv-panties">$0</span></div>
-        <div class="brow"><span class="bname">Leggings</span><div class="bbar-wrap"><div class="bbar" id="bar-leggings"></div></div><span class="bval" id="bv-leggings">$0</span></div>
-        <div class="brow"><span class="bname">Shorts</span><div class="bbar-wrap"><div class="bbar" id="bar-shorts"></div></div><span class="bval" id="bv-shorts">$0</span></div>
-        <div class="brow"><span class="bname">Socks</span><div class="bbar-wrap"><div class="bbar" id="bar-socks"></div></div><span class="bval" id="bv-socks">$0</span></div>
-        <div class="brow"><span class="bname">Photos</span><div class="bbar-wrap"><div class="bbar" id="bar-photos"></div></div><span class="bval" id="bv-photos">$0</span></div>
-        <div class="brow"><span class="bname">Tips</span><div class="bbar-wrap"><div class="bbar" id="bar-tips"></div></div><span class="bval" id="bv-tips">$0</span></div>
-        <div class="brow"><span class="bname">PPV</span><div class="bbar-wrap"><div class="bbar" id="bar-ppv"></div></div><span class="bval" id="bv-ppv">$0</span></div>
       </div>
 
     </div>
@@ -860,6 +863,10 @@
     animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
     saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
+    // OF Total
+    const ofTotalEl = document.getElementById('stat-of-total');
+    if (ofTotalEl) { animateCounter(ofTotalEl, parseFloat(ofTotalEl.dataset.raw || 0), ofTotal, 500); ofTotalEl.dataset.raw = ofTotal; ofTotalEl.style.color = '#00aff0'; }
+
     // Annual Increase vs $36K benchmark
     const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 36000;
     const aiEl = document.getElementById('stat-annual-increase');
@@ -894,8 +901,10 @@
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
-      document.getElementById('bar-' + k).style.width = (netPeriod[k] / maxVal * 100) + '%';
-      document.getElementById('bv-'  + k).textContent = fmt(netPeriod[k]);
+      const barEl = document.getElementById('bar-' + k);
+      const bvEl  = document.getElementById('bv-'  + k);
+      if (barEl) barEl.style.width = (netPeriod[k] / maxVal * 100) + '%';
+      if (bvEl)  bvEl.textContent  = fmt(netPeriod[k]);
     });
 
 
