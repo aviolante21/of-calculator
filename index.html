@@ -299,6 +299,7 @@
     text-transform: uppercase;
     color: rgba(255,255,255,0.55);
     margin-top: 4px;
+    text-align: center;
   }
 
   .t-breakdown {
@@ -530,63 +531,6 @@
 
 
   /* Income inputs row */
-  .income-inputs-row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-  .income-input-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 14px;
-    box-shadow: var(--shadow);
-  }
-  .income-input-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
-    text-align: center;
-  }
-  .income-input-unit {
-    opacity: 0.6;
-    font-size: 8px;
-  }
-  .income-input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .income-input-prefix {
-    position: absolute;
-    left: 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    pointer-events: none;
-  }
-  .income-input {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text);
-    padding: 4px 10px 4px 20px;
-    width: 120px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
   .income-input:focus { border-color: var(--blue); }
   .income-input::placeholder { color: var(--muted2); }
 </style>
@@ -604,30 +548,24 @@
     <button class="scene-btn" id="btn-aggressive"   onclick="loadScenario('aggressive')">🚀 Aggressive</button>
     <button class="scene-btn" onclick="resetAll()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);">↺ Reset</button>
   </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.6);">Base Salary</span>
+    <div style="position:relative;display:flex;align-items:center;">
+      <span style="position:absolute;left:10px;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.7);">$</span>
+      <input
+        id="baseline-input"
+        type="number"
+        value="0"
+        min="0"
+        step="1000"
+        oninput="updateBaseline(this.value)"
+        style="font-family:'DM Mono',monospace;font-size:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:#fff;padding:5px 10px 5px 22px;width:110px;outline:none;"
+      />
+    </div>
+  </div>
 </div>
 
 <div class="page">
-
-  <!-- Income inputs row — full width centered -->
-  <div class="income-inputs-row">
-    <div class="income-input-group">
-      <span class="income-input-label">Agency Salary <span class="income-input-unit">/mo</span></span>
-      <div class="income-input-wrap">
-        <span class="income-input-prefix">$</span>
-        <input id="baseline-input" type="number" value="0" min="0" step="100"
-          oninput="updateBaseline(this.value)" class="income-input" placeholder="0"/>
-      </div>
-    </div>
-    <div class="income-input-group">
-      <span class="income-input-label">Current Net <span class="income-input-unit">/mo</span></span>
-      <div class="income-input-wrap">
-        <span class="income-input-prefix">$</span>
-        <input id="takehome-input" type="number" value="0" min="0" step="100"
-          oninput="recalculate()" class="income-input" placeholder="0"/>
-      </div>
-    </div>
-  </div>
-
   <div class="wrapper">
 
     <div class="cards-grid">
@@ -724,7 +662,7 @@
         <div class="mobile-sub-row">
           <div class="mobile-sub-item">
             <div class="mobile-sub-val" id="mobile-pct">0%</div>
-            <div class="mobile-sub-label">OF Boost / mo</div>
+            <div class="mobile-sub-label">Monthly Increase</div>
           </div>
           <div class="mobile-divider"></div>
           <div class="mobile-sub-item">
@@ -734,20 +672,14 @@
         </div>
       </div>
 
-      <div class="t-main">
-        <div class="t-head">Base + OF Earnings</div>
-        <div class="t-amount" id="grand-total">$0</div>
-        <div class="t-sub">
-          <span class="t-sub-base">$36K AGENCY +</span>
-          <span class="t-sub-of" id="of-addon">$0 OF</span>
-        </div>
-        <div class="t-period" id="total-period">over 1 month</div>
-      </div>
-
       <div class="t-stats">
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-monthly">+$0</div>
-          <div class="t-stat-label">OF Boost / mo</div>
+          <div class="t-stat-val" id="stat-annual-increase">-$36.0K</div>
+          <div class="t-stat-label">Annual Increase</div>
+        </div>
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-monthly">-$3.0K</div>
+          <div class="t-stat-label">Monthly Increase</div>
         </div>
         <div class="t-stat">
           <div class="t-stat-val" id="stat-annual">$36K</div>
@@ -880,33 +812,22 @@
     });
 
     const ofTotal       = Object.values(netPeriod).reduce((a,b)=>a+b, 0);
-    const baseForPeriod = BASE_SALARY * m;
+    const baseForPeriod = (BASE_SALARY / 12) * m;
     const grand         = baseForPeriod + ofTotal;
     const avgMonthlyOF  = ofTotal / m;
-
-    // Animate grand total with odometer roll + color coding
-    const gtEl = document.getElementById('grand-total');
-    const prevVal = parseFloat(gtEl.dataset.raw || BASE_SALARY);
-    gtEl.dataset.raw = grand;
-    animateCounter(gtEl, prevVal, grand, 600);
-
-    // Color-code based on OF earnings tier
-    gtEl.style.color = '#ffffff';
-
-    document.getElementById('of-addon').textContent     = fmt(ofTotal) + ' OF';
-    document.getElementById('total-period').textContent = 'over ' + m + (m===1?' month':' months');
 
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
 
-    // OF Boost: (Agency Salary/mo + monthly OF) vs take-home
-    const takeHome = parseFloat(document.getElementById('takehome-input')?.value || 0);
-    const monthlyAgency = BASE_SALARY;
+    // Monthly Increase: (Base/mo + OF monthly) vs $3K benchmark
+    const BENCHMARK = 3000;
+    const monthlyBase = BASE_SALARY / 12;
     const monthlyOF = ofTotal / m;
-    const diff = (monthlyAgency + monthlyOF) - takeHome;
-    const prevDiff = parseFloat(smEl.dataset.raw || 0);
+    const diff = (monthlyBase + monthlyOF) - BENCHMARK;
+    const prevDiff = parseFloat(smEl.dataset.raw || -BENCHMARK);
     smEl.dataset.raw = diff;
+    smEl.style.color = diff >= 0 ? '#4ade80' : '#ff6b6b';
     (() => {
       const start = performance.now();
       const dur = 500;
@@ -927,17 +848,47 @@
       }
       activeAnimations[id] = requestAnimationFrame(step);
     })();
-    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), (BASE_SALARY * 12) + (avgMonthlyOF * 12), 500);
-    saEl.dataset.raw = (BASE_SALARY * 12) + (avgMonthlyOF * 12);
+    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
+    saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
-    document.querySelector('.t-sub-base').textContent = fmt(BASE_SALARY) + ' AGENCY +';
+    // Annual Increase vs $36K benchmark
+    const ANNUAL_BENCHMARK = 36000;
+    const annualEarnings = BASE_SALARY + (avgMonthlyOF * 12);
+    const annualDiff = annualEarnings - ANNUAL_BENCHMARK;
+    const aiEl = document.getElementById('stat-annual-increase');
+    if (aiEl) {
+      const prevAnnualDiff = parseFloat(aiEl.dataset.raw || -ANNUAL_BENCHMARK);
+      aiEl.dataset.raw = annualDiff;
+      aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b';
+      (() => {
+        const start = performance.now();
+        const dur = 500;
+        const id = 'stat-annual-increase';
+        if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
+        function step(now) {
+          const p = Math.min((now - start) / dur, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          const cur = prevAnnualDiff + (annualDiff - prevAnnualDiff) * ease;
+          aiEl.textContent = (cur >= 0 ? '+' : '-') + fmt(Math.abs(cur));
+          aiEl.style.color = cur >= 0 ? '#4ade80' : '#ff6b6b';
+          if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
+          else {
+            aiEl.textContent = (annualDiff >= 0 ? '+' : '-') + fmt(Math.abs(annualDiff));
+            aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b';
+            delete activeAnimations[id];
+          }
+        }
+        activeAnimations[id] = requestAnimationFrame(step);
+      })();
+    }
+
 
     // Update mobile hero
     const mAnnual = document.getElementById('mobile-annual');
     const mPct    = document.getElementById('mobile-pct');
     const mGrand  = document.getElementById('mobile-grand');
-    if (mAnnual) mAnnual.textContent = fmt((BASE_SALARY * 12) + (avgMonthlyOF * 12));
-    const _th = parseFloat(document.getElementById('takehome-input')?.value || 0); const _diff = (BASE_SALARY + ofTotal / m) - _th; if (mPct) { mPct.textContent = (_diff >= 0 ? '+' : '-') + fmt(Math.abs(_diff)); mPct.style.color = _diff >= 0 ? '#4ade80' : '#ff6b6b'; }
+    if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+    const _diff = (BASE_SALARY / 12 + ofTotal / m) - 3000; if (mPct) { mPct.textContent = (_diff >= 0 ? '+' : '-') + fmt(Math.abs(_diff)); mPct.style.color = _diff >= 0 ? '#4ade80' : '#ff6b6b'; }
     if (mGrand)  mGrand.textContent  = fmt(grand);
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
