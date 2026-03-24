@@ -25,7 +25,7 @@
     --text:    #e6f1ff;
     --muted:   #4a90b8;
     --muted2:  #2a4a62;
-    --green:   #4ade80;
+    --green:   #00e5a0;
     --shadow:  0 2px 18px rgba(0,0,0,0.4);
   }
 
@@ -299,7 +299,6 @@
     text-transform: uppercase;
     color: rgba(255,255,255,0.55);
     margin-top: 4px;
-    text-align: center;
   }
 
   .t-breakdown {
@@ -529,10 +528,6 @@
   }
 
 
-
-  /* Income inputs row */
-  .income-input:focus { border-color: var(--blue); }
-  .income-input::placeholder { color: var(--muted2); }
 </style>
 </head>
 <body>
@@ -658,7 +653,7 @@
       <!-- Mobile-only hero block -->
       <div class="mobile-totals-hero" id="mobile-hero">
         <div class="mobile-annualized" id="mobile-annual">$36.0K</div>
-        <div class="mobile-annualized-label">Annualized</div>
+        <div class="mobile-annualized-label">Net Salary</div>
         <div class="mobile-sub-row">
           <div class="mobile-sub-item">
             <div class="mobile-sub-val" id="mobile-pct">0%</div>
@@ -672,18 +667,25 @@
         </div>
       </div>
 
+      <!-- Hidden elements so JS doesn't crash -->
+      <span id="grand-total" style="display:none"></span>
+      <span id="of-addon" style="display:none"></span>
+      <span id="total-period" style="display:none"></span>
+      <span class="t-sub-base" style="display:none"></span>
+
+      <div class="t-stat" style="padding:0 28px;border-right:1px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;align-items:center;">
+        <div class="t-stat-val" id="stat-annual-increase">-$36.0K</div>
+        <div class="t-stat-label">Annual Increase</div>
+      </div>
+
       <div class="t-stats">
-        <div class="t-stat">
-          <div class="t-stat-val" id="stat-annual-increase">-$36.0K</div>
-          <div class="t-stat-label">Annual Increase</div>
-        </div>
         <div class="t-stat">
           <div class="t-stat-val" id="stat-monthly">-$3.0K</div>
           <div class="t-stat-label">Monthly Increase</div>
         </div>
         <div class="t-stat">
           <div class="t-stat-val" id="stat-annual">$36K</div>
-          <div class="t-stat-label">Annualized</div>
+          <div class="t-stat-label">Net Salary</div>
         </div>
       </div>
 
@@ -816,18 +818,26 @@
     const grand         = baseForPeriod + ofTotal;
     const avgMonthlyOF  = ofTotal / m;
 
+    // Animate grand total with odometer roll + color coding
+    const gtEl = document.getElementById('grand-total');
+    const prevVal = parseFloat(gtEl.dataset.raw || BASE_SALARY);
+    gtEl.dataset.raw = grand;
+    animateCounter(gtEl, prevVal, grand, 600);
+
+    // Color-code based on OF earnings tier
+    gtEl.style.color = '#ffffff';
+
+    document.getElementById('of-addon').textContent     = fmt(ofTotal) + ' OF';
+    document.getElementById('total-period').textContent = 'over ' + m + (m===1?' month':' months');
+
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
-
-    // Monthly Increase: (Base/mo + OF monthly) vs $3K benchmark
+    // Monthly Increase vs $3K/mo benchmark
     const BENCHMARK = 3000;
-    const monthlyBase = BASE_SALARY / 12;
-    const monthlyOF = ofTotal / m;
-    const diff = (monthlyBase + monthlyOF) - BENCHMARK;
+    const diff = (BASE_SALARY / 12 + ofTotal / m) - BENCHMARK;
     const prevDiff = parseFloat(smEl.dataset.raw || -BENCHMARK);
     smEl.dataset.raw = diff;
-    smEl.style.color = diff >= 0 ? '#4ade80' : '#ff6b6b';
     (() => {
       const start = performance.now();
       const dur = 500;
@@ -852,43 +862,35 @@
     saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
     // Annual Increase vs $36K benchmark
-    const ANNUAL_BENCHMARK = 36000;
-    const annualEarnings = BASE_SALARY + (avgMonthlyOF * 12);
-    const annualDiff = annualEarnings - ANNUAL_BENCHMARK;
+    const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 36000;
     const aiEl = document.getElementById('stat-annual-increase');
     if (aiEl) {
-      const prevAnnualDiff = parseFloat(aiEl.dataset.raw || -ANNUAL_BENCHMARK);
+      const prevAD = parseFloat(aiEl.dataset.raw || -36000);
       aiEl.dataset.raw = annualDiff;
-      aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b';
       (() => {
-        const start = performance.now();
-        const dur = 500;
-        const id = 'stat-annual-increase';
+        const start = performance.now(); const dur = 500; const id = 'stat-annual-increase';
         if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
         function step(now) {
           const p = Math.min((now - start) / dur, 1);
           const ease = 1 - Math.pow(1 - p, 3);
-          const cur = prevAnnualDiff + (annualDiff - prevAnnualDiff) * ease;
+          const cur = prevAD + (annualDiff - prevAD) * ease;
           aiEl.textContent = (cur >= 0 ? '+' : '-') + fmt(Math.abs(cur));
           aiEl.style.color = cur >= 0 ? '#4ade80' : '#ff6b6b';
           if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
-          else {
-            aiEl.textContent = (annualDiff >= 0 ? '+' : '-') + fmt(Math.abs(annualDiff));
-            aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b';
-            delete activeAnimations[id];
-          }
+          else { aiEl.textContent = (annualDiff >= 0 ? '+' : '-') + fmt(Math.abs(annualDiff)); aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b'; delete activeAnimations[id]; }
         }
         activeAnimations[id] = requestAnimationFrame(step);
       })();
     }
 
+    document.querySelector('.t-sub-base').textContent = fmt(BASE_SALARY) + ' BASE +';
 
     // Update mobile hero
     const mAnnual = document.getElementById('mobile-annual');
     const mPct    = document.getElementById('mobile-pct');
     const mGrand  = document.getElementById('mobile-grand');
     if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
-    const _diff = (BASE_SALARY / 12 + ofTotal / m) - 3000; if (mPct) { mPct.textContent = (_diff >= 0 ? '+' : '-') + fmt(Math.abs(_diff)); mPct.style.color = _diff >= 0 ? '#4ade80' : '#ff6b6b'; }
+    if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3000; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
     if (mGrand)  mGrand.textContent  = fmt(grand);
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
@@ -955,6 +957,8 @@
     document.getElementById('btn-' + name).classList.add('active');
   }
 
+  document.querySelectorAll('input[type=range]').forEach(s => { s.value = 0; });
+  recalculate();
 </script>
 </body>
 </html>
