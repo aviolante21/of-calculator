@@ -656,13 +656,13 @@
         <div class="mobile-annualized-label">Net Salary</div>
         <div class="mobile-sub-row">
           <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-pct">0%</div>
-            <div class="mobile-sub-label">Monthly Increase</div>
+            <div class="mobile-sub-val" id="mobile-annual-increase">-$36.0K</div>
+            <div class="mobile-sub-label">Annual Increase</div>
           </div>
           <div class="mobile-divider"></div>
           <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-grand">$3.0K</div>
-            <div class="mobile-sub-label">Base + OF Earnings</div>
+            <div class="mobile-sub-val" id="mobile-pct">-$3.0K</div>
+            <div class="mobile-sub-label">Monthly Increase</div>
           </div>
         </div>
       </div>
@@ -888,10 +888,10 @@
     // Update mobile hero
     const mAnnual = document.getElementById('mobile-annual');
     const mPct    = document.getElementById('mobile-pct');
-    const mGrand  = document.getElementById('mobile-grand');
     if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
     if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3000; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
-    if (mGrand)  mGrand.textContent  = fmt(grand);
+    const mAI = document.getElementById('mobile-annual-increase');
+    if (mAI) { const _ad=(BASE_SALARY+avgMonthlyOF*12)-36000; mAI.textContent=(_ad>=0?'+':'-')+fmt(Math.abs(_ad)); mAI.style.color=_ad>=0?'#4ade80':'#ff6b6b'; }
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
