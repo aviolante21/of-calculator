@@ -836,9 +836,9 @@
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
     // Monthly Increase vs $3K/mo benchmark
-    const BENCHMARK = 3000;
+    const BENCHMARK = 3110;
     const diff = (BASE_SALARY / 12 + ofTotal / m) - BENCHMARK;
-    const prevDiff = parseFloat(smEl.dataset.raw || -BENCHMARK);
+    const prevDiff = parseFloat(smEl.dataset.raw || -3110);
     smEl.dataset.raw = diff;
     (() => {
       const start = performance.now();
@@ -868,10 +868,10 @@
     if (ofTotalEl) { animateCounter(ofTotalEl, parseFloat(ofTotalEl.dataset.raw || 0), ofTotal, 500); ofTotalEl.dataset.raw = ofTotal; ofTotalEl.style.color = '#00aff0'; }
 
     // Annual Increase vs $36K benchmark
-    const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 36000;
+    const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 37320;
     const aiEl = document.getElementById('stat-annual-increase');
     if (aiEl) {
-      const prevAD = parseFloat(aiEl.dataset.raw || -36000);
+      const prevAD = parseFloat(aiEl.dataset.raw || -37320);
       aiEl.dataset.raw = annualDiff;
       (() => {
         const start = performance.now(); const dur = 500; const id = 'stat-annual-increase';
@@ -895,9 +895,9 @@
     const mAnnual = document.getElementById('mobile-annual');
     const mPct    = document.getElementById('mobile-pct');
     if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
-    if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3000; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
+    if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3110; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
     const mAI = document.getElementById('mobile-annual-increase');
-    if (mAI) { const _ad=(BASE_SALARY+avgMonthlyOF*12)-36000; mAI.textContent=(_ad>=0?'+':'-')+fmt(Math.abs(_ad)); mAI.style.color=_ad>=0?'#4ade80':'#ff6b6b'; }
+    if (mAI) { const _ad=(BASE_SALARY+avgMonthlyOF*12)-37320; mAI.textContent=(_ad>=0?'+':'-')+fmt(Math.abs(_ad)); mAI.style.color=_ad>=0?'#4ade80':'#ff6b6b'; }
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
