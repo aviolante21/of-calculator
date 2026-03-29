@@ -656,16 +656,21 @@
 
       <!-- Mobile-only hero block -->
       <div class="mobile-totals-hero" id="mobile-hero">
-        <div class="mobile-annualized" id="mobile-annual">$36.0K</div>
+        <div class="mobile-annualized" id="mobile-annual">$0</div>
         <div class="mobile-annualized-label">Net Salary</div>
         <div class="mobile-sub-row">
           <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-annual-increase">-$36.0K</div>
+            <div class="mobile-sub-val" id="mobile-of-total" style="color:#00aff0;">$0</div>
+            <div class="mobile-sub-label">OF Total</div>
+          </div>
+          <div class="mobile-divider"></div>
+          <div class="mobile-sub-item">
+            <div class="mobile-sub-val" id="mobile-annual-increase">-$37.3K</div>
             <div class="mobile-sub-label">Annual Increase</div>
           </div>
           <div class="mobile-divider"></div>
           <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-pct">-$3.0K</div>
+            <div class="mobile-sub-val" id="mobile-pct">-$3.1K</div>
             <div class="mobile-sub-label">Monthly Increase</div>
           </div>
         </div>
@@ -687,11 +692,11 @@
 
         <!-- Monthly + Annual Increase -->
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-monthly">-$3.0K</div>
+          <div class="t-stat-val" id="stat-monthly">-$3.1K</div>
           <div class="t-stat-label">Monthly Increase</div>
         </div>
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-annual-increase">-$36.0K</div>
+          <div class="t-stat-val" id="stat-annual-increase">-$37.3K</div>
           <div class="t-stat-label">Annual Increase</div>
         </div>
 
@@ -835,7 +840,10 @@
     // Animate stat counters
     const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
-    // Monthly Increase vs $3K/mo benchmark
+    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
+    saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
+
+    // Monthly Increase vs $3110/mo benchmark
     const BENCHMARK = 3110;
     const diff = (BASE_SALARY / 12 + ofTotal / m) - BENCHMARK;
     const prevDiff = parseFloat(smEl.dataset.raw || -3110);
@@ -860,14 +868,8 @@
       }
       activeAnimations[id] = requestAnimationFrame(step);
     })();
-    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
-    saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
 
-    // OF Total
-    const ofTotalEl = document.getElementById('stat-of-total');
-    if (ofTotalEl) { animateCounter(ofTotalEl, parseFloat(ofTotalEl.dataset.raw || 0), ofTotal, 500); ofTotalEl.dataset.raw = ofTotal; ofTotalEl.style.color = '#00aff0'; }
-
-    // Annual Increase vs $36K benchmark
+    // Annual Increase vs $37320 benchmark
     const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 37320;
     const aiEl = document.getElementById('stat-annual-increase');
     if (aiEl) {
@@ -889,15 +891,22 @@
       })();
     }
 
+    // OF Total
+    const ofTotalEl = document.getElementById('stat-of-total');
+    if (ofTotalEl) { animateCounter(ofTotalEl, parseFloat(ofTotalEl.dataset.raw || 0), ofTotal, 500); ofTotalEl.dataset.raw = ofTotal; ofTotalEl.style.color = '#00aff0'; }
+
     document.querySelector('.t-sub-base').textContent = fmt(BASE_SALARY) + ' BASE +';
 
     // Update mobile hero
     const mAnnual = document.getElementById('mobile-annual');
     const mPct    = document.getElementById('mobile-pct');
     if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+    const mOFTotal = document.getElementById('mobile-of-total');
+    if (mOFTotal) { mOFTotal.textContent = fmt(ofTotal); mOFTotal.style.color = '#00aff0'; }
     if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3110; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
     const mAI = document.getElementById('mobile-annual-increase');
     if (mAI) { const _ad=(BASE_SALARY+avgMonthlyOF*12)-37320; mAI.textContent=(_ad>=0?'+':'-')+fmt(Math.abs(_ad)); mAI.style.color=_ad>=0?'#4ade80':'#ff6b6b'; }
+
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
     Object.keys(netPeriod).forEach(k => {
@@ -967,6 +976,7 @@
 
   document.querySelectorAll('input[type=range]').forEach(s => { s.value = 0; });
   recalculate();
+
 </script>
 </body>
 </html>
