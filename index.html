@@ -532,6 +532,15 @@
   }
 
 
+
+  .t-stat-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #4ade80;
+    margin-top: 3px;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -664,15 +673,7 @@
             <div class="mobile-sub-label">OF Total</div>
           </div>
           <div class="mobile-divider"></div>
-          <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-annual-increase">-$37.3K</div>
-            <div class="mobile-sub-label">Annual Increase</div>
-          </div>
-          <div class="mobile-divider"></div>
-          <div class="mobile-sub-item">
-            <div class="mobile-sub-val" id="mobile-pct">-$3.1K</div>
-            <div class="mobile-sub-label">Monthly Increase</div>
-          </div>
+
         </div>
       </div>
 
@@ -690,20 +691,25 @@
           <div class="t-stat-label">OnlyFans Total</div>
         </div>
 
-        <!-- Monthly + Annual Increase -->
+        <!-- Net Monthly: Net Salary / 12 -->
         <div class="t-stat">
-          <div class="t-stat-val" id="stat-monthly">-$3.1K</div>
-          <div class="t-stat-label">Monthly Increase</div>
-        </div>
-        <div class="t-stat">
-          <div class="t-stat-val" id="stat-annual-increase">-$37.3K</div>
-          <div class="t-stat-label">Annual Increase</div>
+          <div class="t-stat-val" id="stat-net-monthly" style="font-size:72px;line-height:1;">$0</div>
+          <div class="t-stat-label">Net Monthly</div>
+          <div class="t-stat-delta" id="delta-net-monthly">—</div>
         </div>
 
-        <!-- Net Salary — large, last -->
-        <div class="t-stat" style="border-right:none;">
+        <!-- Net Salary: (Base × 67%) + OF Total -->
+        <div class="t-stat">
           <div class="t-stat-val" id="stat-annual" style="font-size:72px;line-height:1;">$0</div>
           <div class="t-stat-label">Net Salary</div>
+          <div class="t-stat-delta" id="delta-net-salary">—</div>
+        </div>
+
+        <!-- Gross Salary: Base + OF Total -->
+        <div class="t-stat">
+          <div class="t-stat-val" id="stat-gross" style="font-size:72px;line-height:1;">$0</div>
+          <div class="t-stat-label">Gross Salary</div>
+          <div class="t-stat-delta" id="delta-gross-salary">—</div>
         </div>
 
       </div>
@@ -838,58 +844,36 @@
     document.getElementById('total-period').textContent = 'over ' + m + (m===1?' month':' months');
 
     // Animate stat counters
-    const smEl = document.getElementById('stat-monthly');
     const saEl = document.getElementById('stat-annual');
-    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), BASE_SALARY + (avgMonthlyOF * 12), 500);
-    saEl.dataset.raw = BASE_SALARY + (avgMonthlyOF * 12);
+    const netSalary = (BASE_SALARY * 0.67) + (avgMonthlyOF * 12);
+    const grossSalary = BASE_SALARY + (avgMonthlyOF * 12);
+    animateCounter(saEl, parseFloat(saEl.dataset.raw || 0), netSalary, 500);
+    saEl.dataset.raw = netSalary;
 
-    // Monthly Increase vs $3110/mo benchmark
-    const BENCHMARK = 3110;
-    const diff = (BASE_SALARY / 12 + ofTotal / m) - BENCHMARK;
-    const prevDiff = parseFloat(smEl.dataset.raw || -3110);
-    smEl.dataset.raw = diff;
-    (() => {
-      const start = performance.now();
-      const dur = 500;
-      const id = 'stat-monthly';
-      if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
-      function step(now) {
-        const p = Math.min((now - start) / dur, 1);
-        const ease = 1 - Math.pow(1 - p, 3);
-        const cur = prevDiff + (diff - prevDiff) * ease;
-        smEl.textContent = (cur >= 0 ? '+' : '-') + fmt(Math.abs(cur));
-        smEl.style.color = cur >= 0 ? '#4ade80' : '#ff6b6b';
-        if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
-        else {
-          smEl.textContent = (diff >= 0 ? '+' : '-') + fmt(Math.abs(diff));
-          smEl.style.color = diff >= 0 ? '#4ade80' : '#ff6b6b';
-          delete activeAnimations[id];
-        }
-      }
-      activeAnimations[id] = requestAnimationFrame(step);
-    })();
 
-    // Annual Increase vs $37320 benchmark
-    const annualDiff = (BASE_SALARY + avgMonthlyOF * 12) - 37320;
-    const aiEl = document.getElementById('stat-annual-increase');
-    if (aiEl) {
-      const prevAD = parseFloat(aiEl.dataset.raw || -37320);
-      aiEl.dataset.raw = annualDiff;
-      (() => {
-        const start = performance.now(); const dur = 500; const id = 'stat-annual-increase';
-        if (activeAnimations[id]) cancelAnimationFrame(activeAnimations[id]);
-        function step(now) {
-          const p = Math.min((now - start) / dur, 1);
-          const ease = 1 - Math.pow(1 - p, 3);
-          const cur = prevAD + (annualDiff - prevAD) * ease;
-          aiEl.textContent = (cur >= 0 ? '+' : '-') + fmt(Math.abs(cur));
-          aiEl.style.color = cur >= 0 ? '#4ade80' : '#ff6b6b';
-          if (p < 1) activeAnimations[id] = requestAnimationFrame(step);
-          else { aiEl.textContent = (annualDiff >= 0 ? '+' : '-') + fmt(Math.abs(annualDiff)); aiEl.style.color = annualDiff >= 0 ? '#4ade80' : '#ff6b6b'; delete activeAnimations[id]; }
-        }
-        activeAnimations[id] = requestAnimationFrame(step);
-      })();
+
+    // Gross Salary
+    const grossEl = document.getElementById('stat-gross');
+    if (grossEl) { animateCounter(grossEl, parseFloat(grossEl.dataset.raw || 0), grossSalary, 500); grossEl.dataset.raw = grossSalary; }
+
+
+    // Delta lines — growth vs Base Salary
+    const baseMonthly = BASE_SALARY / 12;
+    function setDelta(id, value, base) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const d = value - base;
+      if (base === 0 && value === 0) { el.textContent = '—'; el.style.color = 'rgba(255,255,255,0.3)'; return; }
+      el.textContent = (d >= 0 ? '+' : '-') + fmt(Math.abs(d));
+      el.style.color = d >= 0 ? '#4ade80' : '#ff6b6b';
     }
+    setDelta('delta-net-monthly', netSalary / 12,    baseMonthly * 0.67);
+    setDelta('delta-net-salary',  netSalary,         BASE_SALARY * 0.67);
+    setDelta('delta-gross-salary',grossSalary,       BASE_SALARY);
+
+    // Net Monthly: netSalary / 12
+    const netMonthlyEl = document.getElementById('stat-net-monthly');
+    if (netMonthlyEl) { animateCounter(netMonthlyEl, parseFloat(netMonthlyEl.dataset.raw || 0), netSalary / 12, 500); netMonthlyEl.dataset.raw = netSalary / 12; }
 
     // OF Total
     const ofTotalEl = document.getElementById('stat-of-total');
@@ -899,13 +883,9 @@
 
     // Update mobile hero
     const mAnnual = document.getElementById('mobile-annual');
-    const mPct    = document.getElementById('mobile-pct');
-    if (mAnnual) mAnnual.textContent = fmt(BASE_SALARY + (avgMonthlyOF * 12));
+    if (mAnnual) mAnnual.textContent = fmt((BASE_SALARY * 0.67) + (avgMonthlyOF * 12));
     const mOFTotal = document.getElementById('mobile-of-total');
     if (mOFTotal) { mOFTotal.textContent = fmt(ofTotal); mOFTotal.style.color = '#00aff0'; }
-    if (mPct) { const _d=(BASE_SALARY/12+ofTotal/m)-3110; mPct.textContent=(_d>=0?'+':'-')+fmt(Math.abs(_d)); mPct.style.color=_d>=0?'#4ade80':'#ff6b6b'; }
-    const mAI = document.getElementById('mobile-annual-increase');
-    if (mAI) { const _ad=(BASE_SALARY+avgMonthlyOF*12)-37320; mAI.textContent=(_ad>=0?'+':'-')+fmt(Math.abs(_ad)); mAI.style.color=_ad>=0?'#4ade80':'#ff6b6b'; }
 
 
     const maxVal = Math.max(...Object.values(netPeriod), 1);
